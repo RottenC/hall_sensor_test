@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Websock</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="./bootstrap.min.css">
+    <style>
+          h3.header{
+                background-color:slategray;
+                color:white;
+          }
+    </style>
+<!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="./jquery-3.6.0.min.js" ></script>
+    <script src="./popper.min.js"></script>
+    <script src="./bootstrap.min.js"></script>
+
+</head>
+    <body>
+
+       
+        <div class="container">
+            <div class="row">
+                  <div class="col-sm">
+                    <table class="table table-dark table-striped table-sm">
+                        <tr><td>Count:</td><td><span id="count">No data</span></td></tr>
+                        <tr><td>ADC:</td><td><span id="adc">No data</span></td></tr>
+                        <tr><td>Distance:</td><td><span id="distance">No data</span></td></tr>
+                      </table>
+                 </div>
+        </div>
+       
+       
+       
+       <script>
+            var ws = new WebSocket("ws://127.0.0.1:5678/"),
+                messages = document.createElement('ul');
+            ws.onmessage = function (event) {
+                var obj = jQuery.parseJSON(event.data);
+                $('#count').text(obj.count);
+                $('#adc').text(obj.adc);
+                $('#distance').text(obj.distance);
+            };
+            document.body.appendChild(messages);
+        </script>
+    </body>
+</html>
