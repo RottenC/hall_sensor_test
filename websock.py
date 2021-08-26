@@ -17,19 +17,17 @@ async def time(websocket, path):
     ser = serial.Serial('/dev/ttyACM0',timeout=0.5)  # open serial port
 
     while True:
-        s = ser.read(4096)
+        
+        s = ser.readline()
         if len(s) != 0:
             d = str(s,'utf-8')
-            chunks = d.split('\n')
-            for val in chunks:
-                if val != '':
-                    serial_data = val.split(':')
-                    timestamp = int(serial_data[0])
-                    count = int(serial_data[1])
-                    adc = int(serial_data[2])
-                    distance = 0
-                    print(adc)
-                    await websocket.send('{"count": '+str(count)+', "adc": '+str(adc)+', "distance": '+str(distance)+'  }')
+            serial_data = d.split(':')
+            timestamp = int(serial_data[0])
+            count = int(serial_data[1])
+            adc = int(serial_data[2])
+            distance = 0
+            print(adc)
+            await websocket.send('{"count": '+str(count)+', "adc": '+str(adc)+', "distance": '+str(distance)+'  }')
         
         #await asyncio.sleep(random.random() * 3)
 
