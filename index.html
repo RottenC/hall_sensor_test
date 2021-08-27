@@ -49,12 +49,18 @@
       
         function addPoint(x, y) {
             dataSet.append({x: x, value: y});
-        }
+        };
+
+        function chart_clear() {
+            var raw_count = dataSet.getRowsCount();
+            for (let i = 0; i < raw_count; i++) {
+                dataSet.remove(0);
+            }
+        };
+
       </script>
 </head>
     <body>
-
-       
         <div class="container">
             <div class="row">
                   <div class="col-sm">
@@ -65,9 +71,10 @@
                       </table>
                  </div>
         </div>
-       
+        <div class="container">
+            <button type="button" id="reset_button" class="btn btn-warning">Reset</button>
+        </div>
         <div id="container" style="width: 1300px; height: 600px;"></div>
-       
        
        <script>
             var ws = new WebSocket("ws://127.0.0.1:5678/"),
@@ -81,6 +88,12 @@
                 addPoint(obj.distance,obj.adc);
             };
             document.body.appendChild(messages);
-        </script>
+       
+            $(document).ready(function(){
+                $("#reset_button").click(function(){
+                    chart_clear();
+                });
+            });
+       </script>
     </body>
 </html>
