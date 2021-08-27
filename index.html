@@ -18,6 +18,39 @@
     <script src="./popper.min.js"></script>
     <script src="./bootstrap.min.js"></script>
 
+    <script src="anychart-base.min.js" type="text/javascript"></script>
+    <script src="anychart-data-adapter.min.js"></script>
+
+
+    <script>
+        anychart.onDocumentLoad(function () {
+            data = [  
+                [0, 0]
+            ];
+          var chart = anychart.scatter();
+          
+          dataSet = anychart.data.set(data);
+          
+          chart.marker(dataSet);
+
+          chart.xAxis().title('Distance');
+          chart.yAxis().title('ADC');
+
+          chart.yScale().minimum(0);
+          chart.yScale().maximum(4096);
+
+          chart.xScale().maximum(10000);
+
+          chart.title("ADC vs Distance");
+          chart.container("container");
+          chart.draw();
+        });
+      
+      
+        function addPoint(x, y) {
+            dataSet.append({x: x, value: y});
+        }
+      </script>
 </head>
     <body>
 
@@ -33,6 +66,7 @@
                  </div>
         </div>
        
+        <div id="container" style="width: 1300px; height: 600px;"></div>
        
        
        <script>
@@ -43,6 +77,8 @@
                 $('#count').text(obj.count);
                 $('#adc').text(obj.adc);
                 $('#distance').text(obj.distance);
+
+                addPoint(obj.distance,obj.adc);
             };
             document.body.appendChild(messages);
         </script>
