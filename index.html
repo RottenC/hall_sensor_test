@@ -71,16 +71,16 @@
 
             // set chart title text settings
             chart.title(
-                'Trend of Sales of the Most Popular Products of ACME Corp.'
+                'Distance vs ADC'
             );
 
             // set yAxis title
-            chart.yAxis().title('Number of Bottles Sold (thousands)');
+            chart.yAxis().title('Raw values');
             chart.xAxis().labels().padding(5);
 
             // create first series with mapped data
             var firstSeries = chart.line(firstSeriesData);
-            firstSeries.name('Brandy');
+            firstSeries.name('Distance');
             firstSeries.hovered().markers().enabled(true).type('circle').size(4);
             firstSeries
                 .tooltip()
@@ -91,7 +91,7 @@
 
             // create second series with mapped data
             var secondSeries = chart.line(secondSeriesData);
-            secondSeries.name('Whiskey');
+            secondSeries.name('ADC');
             secondSeries.hovered().markers().enabled(true).type('circle').size(4);
             secondSeries
                 .tooltip()
@@ -99,6 +99,7 @@
                 .anchor('left-center')
                 .offsetX(5)
                 .offsetY(5);
+            secondSeries.stroke('red');
 
             // turn the legend on
             chart.legend().enabled(true).fontSize(13).padding([0, 0, 10, 0]);
