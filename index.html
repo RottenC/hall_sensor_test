@@ -1,18 +1,18 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <title>Websock</title>
+    <html lang="en">
+    <head>
+        <title>Websock</title>
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="./bootstrap.min.css">
-    <style>
-          h3.header{
-                background-color:slategray;
-                color:white;
-          }
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="./bootstrap.min.css">
+        <style>
+        h3.header{
+            background-color:slategray;
+            color:white;
+        }
     </style>
-<!-- Optional JavaScript -->
+    <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="./jquery-3.6.0.min.js" ></script>
     <script src="./popper.min.js"></script>
@@ -20,36 +20,97 @@
 
     <script src="anychart-base.min.js" type="text/javascript"></script>
     <script src="anychart-data-adapter.min.js"></script>
-
+    <script src="anychart-ui.min.js"></script>
+    <script src="anychart-exports.min.js"></script>
 
     <script>
-        anychart.onDocumentLoad(function () {
-            data = [  
-                [0, 0]
-            ];
-          var chart = anychart.scatter();
-          
-          dataSet = anychart.data.set(data);
-          
-          chart.marker(dataSet);
+        var counter = 0;
+        // Глобальные переменные говно, но я в js ни в зуб ногой)
+        var beginT = Date.now();
+        // create data set on our data
+        var dataSet = anychart.data.set(getData());
 
-          chart.xAxis().title('Distance');
-          chart.yAxis().title('ADC');
-
-          chart.yScale().minimum(0);
-          chart.yScale().maximum(4096);
-
-          chart.xScale().maximum(10000);
-
-          chart.title("ADC vs Distance");
-          chart.container("container");
-          chart.draw();
-        });
-      
-      
         function addPoint(x, y) {
-            dataSet.append({x: x, value: y});
+            // dataSet.append([Date.now() - beginT, x, y]); // В принципе можно как-то обрабатывать X и Y, чтобы "выровнять их"
+            dataSet.append([counter, x, y]); // В принципе можно как-то обрабатывать X и Y, чтобы "выровнять их"
+            ++counter;
         };
+
+        function getData() {
+            return dataSet;
+        }
+
+        anychart.onDocumentReady(function() {
+
+            // map data for the first series, take x from the zero column and value from the first column of data set
+            var firstSeriesData = dataSet.mapAs({
+                x: 0,
+                value: 1
+            });
+
+            // map data for the second series, take x from the zero column and value from the second column of data set
+            var secondSeriesData = dataSet.mapAs({
+                x: 0,
+                value: 2
+            });
+
+            // create line chart
+            var chart = anychart.line();
+
+            // turn on chart animation
+            chart.animation(true);
+
+            // set chart padding
+            chart.padding([10, 20, 5, 20]);
+
+            // turn on the crosshair
+            chart.crosshair().enabled(true).yLabel(false).yStroke(null);
+
+            // set tooltip mode to point
+            chart.tooltip().positionMode('point');
+
+            // set chart title text settings
+            chart.title(
+                'Trend of Sales of the Most Popular Products of ACME Corp.'
+            );
+
+            // set yAxis title
+            chart.yAxis().title('Number of Bottles Sold (thousands)');
+            chart.xAxis().labels().padding(5);
+
+            // create first series with mapped data
+            var firstSeries = chart.line(firstSeriesData);
+            firstSeries.name('Brandy');
+            firstSeries.hovered().markers().enabled(true).type('circle').size(4);
+            firstSeries
+                .tooltip()
+                .position('right')
+                .anchor('left-center')
+                .offsetX(5)
+                .offsetY(5);
+
+            // create second series with mapped data
+            var secondSeries = chart.line(secondSeriesData);
+            secondSeries.name('Whiskey');
+            secondSeries.hovered().markers().enabled(true).type('circle').size(4);
+            secondSeries
+                .tooltip()
+                .position('right')
+                .anchor('left-center')
+                .offsetX(5)
+                .offsetY(5);
+
+            // turn the legend on
+            chart.legend().enabled(true).fontSize(13).padding([0, 0, 10, 0]);
+
+            // set container id for the chart
+            chart.container('container');
+            // initiate chart drawing
+            chart.draw();
+        });
+
+
+
 
         function chart_clear() {
             var raw_count = dataSet.getRowsCount();
@@ -57,43 +118,43 @@
                 dataSet.remove(0);
             }
         };
-
-      </script>
+    </script>
 </head>
-    <body>
-        <div class="container">
-            <div class="row">
-                  <div class="col-sm">
-                    <table class="table table-dark table-striped table-sm">
-                        <tr><td>Count:</td><td><span id="count">No data</span></td></tr>
-                        <tr><td>ADC:</td><td><span id="adc">No data</span></td></tr>
-                        <tr><td>Distance:</td><td><span id="distance">No data</span></td></tr>
-                      </table>
-                 </div>
+<body>
+    <div class="container">
+        <div class="row">
+          <div class="col-sm">
+            <table class="table table-dark table-striped table-sm">
+                <tr><td>Count:</td><td><span id="count">No data</span></td></tr>
+                <tr><td>ADC:</td><td><span id="adc">No data</span></td></tr>
+                <tr><td>Distance:</td><td><span id="distance">No data</span></td></tr>
+            </table>
         </div>
-        <div class="container">
-            <button type="button" id="reset_button" class="btn btn-warning">Reset</button>
-        </div>
-        <div id="container" style="width: 1300px; height: 550px;"></div>
-       
-       <script>
-            var ws = new WebSocket("ws://127.0.0.1:5678/"),
-                messages = document.createElement('ul');
-            ws.onmessage = function (event) {
-                var obj = jQuery.parseJSON(event.data);
-                $('#count').text(obj.count);
-                $('#adc').text(obj.adc);
-                $('#distance').text(obj.distance);
+    </div>
+    <div class="container">
+        <button type="button" id="reset_button" class="btn btn-warning">Reset</button>
+    </div>
+    <div id="container" style="width: 1300px; height: 550px;"></div>
 
-                addPoint(obj.distance,obj.adc);
-            };
-            document.body.appendChild(messages);
-       
-            $(document).ready(function(){
-                $("#reset_button").click(function(){
-                    chart_clear();
-                });
+    <script>
+        var ws = new WebSocket("ws://127.0.0.1:5678/"),
+        messages = document.createElement('ul');
+        ws.onmessage = function (event) {
+            var obj = jQuery.parseJSON(event.data);
+            $('#count').text(obj.count);
+            $('#adc').text(obj.adc);
+            $('#distance').text(obj.distance);
+
+            addPoint(obj.distance,obj.adc);
+        };
+        document.body.appendChild(messages);
+
+        $(document).ready(function(){
+            $("#reset_button").click(function(){
+                chart_clear();
+                counter = 0;
             });
-       </script>
-    </body>
+        });
+    </script>
+</body>
 </html>
